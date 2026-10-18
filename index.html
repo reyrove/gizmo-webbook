@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <title>Gizmo: Tales of Chaos & Laughter</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="gizmo.css">
+  <link rel="icon" type="image/png" href="images/Gizmo Webbook-modified.png">
+</head>
+<body>
+  <div class="main-container">
+    <div class="toolbar">
+      <div class="tool-group">
+        <button class="icon-btn" id="bookmarkToggleBtn" title="Open bookmarks panel"><i class="fas fa-bookmark"></i></button>
+        <button class="icon-btn add-bookmark-btn" id="addBookmarkBtn" title="Bookmark current panel"><i class="fas fa-plus"></i></button>
+        <button class="icon-btn" id="fullscreenBtn" title="Fullscreen"><i class="fas fa-expand"></i></button>
+        <button class="icon-btn" id="shareBtn" title="Share"><i class="fas fa-share-alt"></i></button>
+      </div>
+      <div class="tool-group">
+        <select class="chapter-select" id="chapterSelect">
+          <option value="foreword">📖 Foreword</option>
+          <option value="quantum">🥞 Quantum Cooking</option>
+          <option value="laundry">🧦 Laundry Disaster</option>
+          <option value="timevac">⏰ Time Vacuum</option>
+          <option value="pizza">🍕 Pizza Portal</option>
+          <option value="fashion">👗 Fashion Fiasco</option>
+          <option value="end">❤️ The End</option>
+        </select>
+        <span class="panel-counter-badge" id="panelCounterBadge">1 / 0</span>
+      </div>
+    </div>
+
+    <div class="panel-view" id="panelView">
+      <div class="panel-display" id="panelDisplay"></div>
+      <div class="panel-navigation">
+        <button class="nav-btn" id="prevPanelBtn"><i class="fas fa-chevron-left"></i> Previous</button>
+        <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="panel-indicator" id="panelIndicator">0/0</span>
+        <button class="nav-btn" id="nextPanelBtn">Next <i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bookmarks-panel" id="bookmarksPanel">
+    <div class="bookmark-header">
+      <h3><i class="fas fa-bookmark"></i> Bookmarks</h3>
+      <button class="clear-btn" id="clearAllBookmarksBtn"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+    <div class="bookmark-list" id="bookmarkListContainer"></div>
+  </div>
+
+  <div class="toast-message" id="toast"></div>
+<!-- THE GIZMO BUTTON -->
+<div class="gizmo-button-container" id="gizmoButtonContainer">
+  <button class="gizmo-button" id="gizmoButton" title="Seriously. Do NOT push this.">
+    <span class="gizmo-button-text">DO NOT PUSH</span>
+    <span class="gizmo-button-icon">⚠️</span>
+  </button>
+  <div class="gizmo-counter" id="gizmoCounter">Pushed 0 times. Gizmo is watching.</div>
+</div>
+
+<!-- EXPLOSION CONTAINER -->
+<div class="explosion-container" id="explosionContainer"></div>
+
+<!-- QUOTE POPUP -->
+<div class="quote-popup" id="quotePopup"></div>
+
+
+<!-- CHAOS METER - LEFT CORNER -->
+<div class="chaos-meter-container" id="chaosMeterContainer">
+  <div class="chaos-label" id="chaosLabel">😌 Calm</div>
+  <div class="chaos-meter">
+    <div class="chaos-meter-fill" id="chaosMeterFill"></div>
+    <div class="chaos-meter-bubbles" id="chaosBubbles"></div>
+  </div>
+  <div class="chaos-percentage" id="chaosPercentage">0%</div>
+  <div class="chaos-status" id="chaosStatus">Gizmo is asleep... for now.</div>
+</div>
+  <script src="gizmo-stories.js"></script>
+  <script src="gizmo.js"></script>
+</body>
+</html>
