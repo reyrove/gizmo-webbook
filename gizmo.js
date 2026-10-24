@@ -80,6 +80,11 @@
 
     prevBtn.disabled = currentPanelIndex === 0;
     nextBtn.disabled = currentPanelIndex === total - 1;
+
+    // Reset scroll position for new content
+    if (panel.type === 'content') {
+      panelDisplay.scrollTop = 0;
+    }
   }
 
   function goToPanel(delta) {
@@ -124,7 +129,7 @@
   }
 
   function deleteBookmark(id, e) {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     bookmarks = bookmarks.filter(b => b.id !== id);
     saveBookmarksToStorage();
     renderBookmarks();
@@ -601,6 +606,31 @@
     }, 200);
   }
 
+  // ========== PREVENT DOUBLE-TAP ZOOM (mobile) ==========
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      // Only block if it's not inside the scrollable content area
+      if (!e.target.closest('.content-panel, .bookmark-list, .content-panel p')) {
+        e.preventDefault();
+      }
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  // Block iOS pinch-zoom gesture
+  document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
+  // Block desktop/iPad double-click zoom
+  document.addEventListener('dblclick', (e) => {
+    if (!e.target.closest('.content-panel, .bookmark-list')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
   // ========== EVENT LISTENERS ==========
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); goToPanel(1); }
@@ -610,15 +640,37 @@
     else if (e.key === 'g' && e.ctrlKey && e.shiftKey) { e.preventDefault(); handleGizmoButtonClick(); }
   });
 
+  // ========== SWIPE NAVIGATION ==========
   let touchStartX = 0;
-  document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
-  document.addEventListener('touchend', e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      if (diff > 0) goToPanel(1);
-      else goToPanel(-1);
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - touchEndY;
+    const timeDiff = Date.now() - touchStartTime;
+
+    // Only treat as swipe if:
+    // - horizontal movement > 50px
+    // - vertical movement < 60px (not a scroll)
+    // - quick gesture (< 500ms)
+    // - not touching an interactive element
+    if (Math.abs(diffX) > 50 &&
+        Math.abs(diffY) < 60 &&
+        timeDiff < 500 &&
+        !e.target.closest('button, a, select, input, .bookmark-item, .gizmo-button')) {
+      if (diffX > 0) goToPanel(1);   // swipe left → next
+      else goToPanel(-1);             // swipe right → previous
     }
-  });
+  }, { passive: true });
 
   prevBtn.addEventListener('click', () => goToPanel(-1));
   nextBtn.addEventListener('click', () => goToPanel(1));
@@ -629,6 +681,15 @@
   document.getElementById('shareBtn').addEventListener('click', shareCurrent);
   clearAllBtn.addEventListener('click', clearAllBookmarks);
   gizmoButton.addEventListener('click', handleGizmoButtonClick);
+
+  // Close bookmarks panel when tapping outside
+  document.addEventListener('click', (e) => {
+    if (bookmarksPanel.classList.contains('open') &&
+        !bookmarksPanel.contains(e.target) &&
+        !bookmarkToggleBtn.contains(e.target)) {
+      bookmarksPanel.classList.remove('open');
+    }
+  });
 
   // ========== INITIALIZATION ==========
   buildPanels();
